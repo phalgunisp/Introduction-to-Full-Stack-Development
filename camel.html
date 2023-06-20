@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>CRUD Application</title>
+    <script src="https://unpkg.com/react/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      // Define a component for creating, updating, reading, and deleting items
+      class CRUDApp extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            camels: [],
+            height: 0,
+            length: 0,
+            stomachRadius: 0,
+            totalSum: 0,
+            editingIndex: -1,
+          };
+        }
+
+        handleInputChange = (event) => {
+          this.setState({ [event.target.name]: parseFloat(event.target.value) });
+        };
+
+        addCamel = () => {
+          const { camels, height, length, stomachRadius } = this.state;
+          const newCamel = { height, length, stomachRadius };
+          this.setState({
+            camels: [...camels, newCamel],
+            height: 0,
+            length: 0,
+            stomachRadius: 0,
+          });
+        };
+
+        editCamel = (index) => {
+          const { camels } = this.state;
+          const { height, length, stomachRadius } = camels[index];
+          this.setState({
+            height,
+            length,
+            stomachRadius,
+            editingIndex: index,
+          });
+        };
+
+        updateCamel = () => {
+          const { camels, height, length, stomachRadius, editingIndex } = this.state;
+          const updatedCamels = [...camels];
+          updatedCamels[editingIndex] = { height, length, stomachRadius };
+          this.setState({
+            camels: updatedCamels,
+            height: 0,
+            length: 0,
+            stomachRadius: 0,
+            editingIndex: -1,
+          });
+        };
+
+        deleteCamel = (index) => {
+          const { camels } = this.state;
+          const updatedCamels = [...camels];
+          updatedCamels.splice(index, 1);
+          this.setState({ camels: updatedCamels });
+        };
+
+        calculateTotalSum = () => {
+          const { camels } = this.state;
+          let totalSum = 0;
+          for (const camel of camels) {
+            totalSum += camel.height + camel.length + camel.stomachRadius;
+          }
+          this.setState({ totalSum });
+        };
+
+        render() {
+          const { camels, height, length, stomachRadius, totalSum, editingIndex } = this.state;
+
+          return (
+            <div>
+              <h2>Camel Information</h2>
+
+              <div>
+                <label>Height (cm):</label>
+                <input
+                  type="number"
+                  name="height"
+                  value={height}
+                  onChange={this.handleInputChange}
+                />
+              </div>
+
+              <div>
+                <label>Length (cm):</label>
+                <input
+                  type="number"
+                  name="length"
+                  value={length}
+                  onChange={this.handleInputChange}
+                />
+              </div>
+
+              <div>
+                <label>Stomach Radius (cm):</label>
+                <input
+                  type="number"
+                  name="stomachRadius"
+                  value={stomachRadius}
+                  onChange={this.handleInputChange}
+                />
+              </div>
+
+              {editingIndex === -1 ? (
+                <button onClick={this.addCamel}>Add Camel</button>
+              ) : (
+                <div>
+                  <button onClick={this.updateCamel}>Update Camel</button>
+                  <button onClick={() => this.setState({ editingIndex: -1, height: 0, length: 0, stomachRadius: 0 })}>Cancel</button>
+                </div>
+              )}
+
+              <ul>
+                {camels.map((camel, index) => (
+                  <li key={index}>
+                    Height: {camel.height} cm, Length: {camel.length} cm, Stomach Radius: {camel.stomachRadius} cm
+                    <button onClick={() => this.editCamel(index)}>Edit</button>
+                    <button onClick={() => this.deleteCamel(index)}>Delete</button>
+                  </li>
+                ))}
+              </ul>
+
+              <button onClick={this.calculateTotalSum}>Calculate Total Sum</button>
+              <p>Total Sum: {totalSum}</p>
+            </div>
+          );
+        }
+      }
+
+      // Render the CRUDApp component to the DOM
+      ReactDOM.render(<CRUDApp />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
